@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | GitInsight Analyzer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="bg-light">
+<div class="container-fluid p-0">
+    <div class="row g-0">
+
+        <!-- ── Sidebar ── -->
+        <aside class="col-lg-2 d-none d-lg-block">
+            <div class="sidebar-modern">
+                <div class="mb-5 px-2">
+                    <a href="/" class="text-decoration-none">
+                        <span class="gradient-text fs-4" style="font-weight:800;">GitInsight</span>
+                    </a>
+                </div>
+                <nav class="nav flex-column">
+                    <a href="#" class="nav-link-modern active" data-section="overview">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                        Overview
+                    </a>
+                    <a href="#" class="nav-link-modern" data-section="activity">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                        Activity
+                    </a>
+                    <a href="#" class="nav-link-modern" data-section="technology">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                        Technology
+                    </a>
+                    <a href="#" class="nav-link-modern" data-section="repos">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v18H3zM9 9h6M9 13h6M9 17h4"/></svg>
+                        Repositories
+                    </a>
+                    <a href="#" class="nav-link-modern" data-section="patterns">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                        Patterns
+                    </a>
+                    <a href="#" class="nav-link-modern" data-section="insights">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        Insights
+                    </a>
+                </nav>
+
+                <!-- Profile mini card in sidebar -->
+                <div class="mt-auto pt-4 px-2" style="margin-top:auto;">
+                    <div class="p-3 rounded-3" style="background:rgba(99,102,241,0.07);border:1px solid rgba(99,102,241,0.12);">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <img src="{{ data.profile.avatar_url }}" width="32" height="32" class="rounded-circle" alt="">
+                            <div>
+                                <div class="fw-bold small">{{ data.profile.username }}</div>
+                                <div class="text-muted" style="font-size:0.7rem;">{{ data.career_role }}</div>
+                            </div>
+                        </div>
+                        <a href="/" class="btn btn-modern w-100 py-2" style="font-size:0.8rem;">Analyze Another</a>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ── Main Content ── -->
+        <main class="col-lg-10 p-4 p-md-5">
+
+            <!-- Mobile header -->
+            <div class="d-lg-none mb-4 d-flex justify-content-between align-items-center">
+                <span class="gradient-text fs-4 fw-bold">GitInsight</span>
+                <button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="location.href='/'">New Search</button>
+            </div>
+
+            <!-- Mobile nav pills (no emojis) -->
+            <div class="d-lg-none mb-4">
+                <div class="mobile-nav-pills">
+                    <span class="mobile-nav-pill active" data-section="overview">Overview</span>
+                    <span class="mobile-nav-pill" data-section="activity">Activity</span>
+                    <span class="mobile-nav-pill" data-section="technology">Technology</span>
+                    <span class="mobile-nav-pill" data-section="repos">Repositories</span>
+                    <span class="mobile-nav-pill" data-section="patterns">Patterns</span>
+                    <span class="mobile-nav-pill" data-section="insights">Insights</span>
+                </div>
+            </div>
+
+            <!-- ── Profile Header ── -->
+            <div class="glass-card p-4 mb-5 animate-fade-in">
+                <div class="row align-items-center g-3">
+                    <div class="col-auto text-center">
+                        <img src="{{ data.profile.avatar_url }}" alt="Avatar" class="profile-avatar">
+                    </div>
+                    <div class="col">
+                        <div class="d-flex flex-wrap align-items-center gap-3 mb-1">
+                            <h2 class="fw-bold mb-0" style="letter-spacing:-0.01em;">
+                                {{ data.profile.name or data.profile.username }}
+                            </h2>
+                            <span class="badge-personality badge-{{ data.metrics.personality|lower }}">
+                                {{ data.metrics.personality }}
+                            </span>
+                        </div>
+                        <p class="text-muted mb-2 small">{{ data.profile.bio or 'No bio available' }}</p>
+                        <div class="d-flex flex-wrap gap-3 small text-muted fw-medium">
+                            {% if data.profile.location and data.profile.location != 'N/A' %}
+                            <span>{{ data.profile.location }}</span>
+                            {% endif %}
+                            {% if data.profile.company and data.profile.company != 'N/A' %}
+                            <span>{{ data.profile.company }}</span>
+                            {% endif %}
+                            <span><strong class="text-dark">{{ data.profile.followers }}</strong> Followers</span>
+                            <span><strong class="text-dark">{{ data.profile.following }}</strong> Following</span>
+                            <span><strong class="text-dark">{{ data.profile.public_repos }}</strong> Repos</span>
+                        </div>
+                    </div>
+                    <div class="col-auto d-none d-md-block text-end">
+                        <div class="career-pill mb-2">{{ data.career_role }}</div>
+                        <div class="small text-muted">Career Prediction</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════════════════════════════════
+                 SECTION: OVERVIEW
+                 ═══════════════════════════════════ -->
+            <section id="section-overview" class="section-scope">
+                <!-- Top Metric Cards -->
+                <div class="row g-4 mb-4">
+                    <div class="col-sm-6 col-md-3">
+                        <div class="glass-card p-4 h-100 text-center">
+                            <div class="metric-label mb-2">Activity Score</div>
+                            <div class="metric-value gradient-text mb-2" id="activityValue">{{ data.activity_score }}</div>
+                            <div class="progress rounded-pill" style="height:6px;">
+                                <div class="progress-bar gradient-bg" id="activityProgress" style="width:0%;" role="progressbar"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <div class="glass-card p-4 h-100 text-center">
+                            <div class="metric-label mb-2">Consistency</div>
+                            <div class="gauge-container mb-1">
+                                <div class="gauge-bg"></div>
+                                <div class="gauge-fill" id="consistencyGauge"></div>
+                            </div>
+                            <div class="fw-bold fs-5">{{ data.metrics.consistency_score }}%</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <div class="glass-card p-4 h-100 text-center d-flex flex-column align-items-center justify-content-center">
+                            <div class="metric-label mb-2">Diversity Index</div>
+                            <div class="position-relative mb-1" style="width:80px;height:80px;">
+                                <svg width="80" height="80" viewBox="0 0 36 36">
+                                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                          fill="none" stroke="#e2e8f0" stroke-width="3"/>
+                                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                          fill="none" stroke="var(--secondary)" stroke-width="3"
+                                          stroke-dasharray="{{ data.metrics.diversity_index }}, 100"
+                                          stroke-linecap="round"/>
+                                </svg>
+                                <div class="position-absolute top-50 start-50 translate-middle fw-bold" style="font-size:0.85rem;">
+                                    {{ data.metrics.diversity_index }}%
+                                </div>
+                            </div>
+                            <div class="small text-muted">Languages / Repos</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <div class="glass-card p-4 h-100 text-center d-flex flex-column align-items-center justify-content-center">
+                            <div class="metric-label mb-2">Complexity</div>
+                            <div class="fw-bold mb-1" style="font-size:1.6rem;color:var(--primary);">
+                                {{ data.metrics.complexity_level }}
+                            </div>
+                            <div class="small text-muted">{{ data.metrics.collaboration_level }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Growth Potential + Impact Score -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-4">
+                        <div class="glass-card p-4 h-100">
+                            <div class="metric-label mb-3">Growth Potential</div>
+                            <div class="fw-bold mb-1" style="font-size:2rem;color:var(--primary);">
+                                {{ data.growth_potential.score }}
+                            </div>
+                            <span class="badge rounded-pill px-3 py-2 fw-semibold small"
+                                  style="background:rgba(16,185,129,0.1);color:#047857;">
+                                {{ data.growth_potential.level }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="glass-card p-4 h-100">
+                            <div class="metric-label mb-3">Innovation Index</div>
+                            <div class="fw-bold mb-1" style="font-size:2rem;color:var(--secondary);">
+                                {{ data.innovation_index }}
+                            </div>
+                            <div class="small text-muted">Unique langs × Total repos</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="glass-card p-4 h-100">
+                            <div class="metric-label mb-3">Impact Score</div>
+                            <div class="fw-bold mb-1" style="font-size:2rem;color:var(--accent);">
+                                {{ data.metrics.impact_score }}
+                            </div>
+                            <div class="small text-muted">Stars×2 + Forks×3 + Issues</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DNA Bar Chart -->
+                <div class="glass-card p-4">
+                    <h5 class="fw-bold mb-4">Developer DNA Breakdown</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="dna-bar-row">
+                                <div class="dna-bar-label"><span>Builder</span><span>{{ data.dna.Builder }}%</span></div>
+                                <div class="dna-bar-track"><div class="dna-bar-fill dna-builder" style="width:{{ data.dna.Builder }}%;animation-delay:0.1s;"></div></div>
+                            </div>
+                            <div class="dna-bar-row">
+                                <div class="dna-bar-label"><span>Collaborator</span><span>{{ data.dna.Collaborator }}%</span></div>
+                                <div class="dna-bar-track"><div class="dna-bar-fill dna-collab" style="width:{{ data.dna.Collaborator }}%;animation-delay:0.2s;"></div></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="dna-bar-row">
+                                <div class="dna-bar-label"><span>Innovator</span><span>{{ data.dna.Innovator }}%</span></div>
+                                <div class="dna-bar-track"><div class="dna-bar-fill dna-innovator" style="width:{{ data.dna.Innovator }}%;animation-delay:0.3s;"></div></div>
+                            </div>
+                            <div class="dna-bar-row">
+                                <div class="dna-bar-label"><span>Consistency</span><span>{{ data.dna.Consistency }}%</span></div>
+                                <div class="dna-bar-track"><div class="dna-bar-fill dna-consist" style="width:{{ data.dna.Consistency }}%;animation-delay:0.4s;"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══════════════════════════════════
+                 SECTION: ACTIVITY
+                 ═══════════════════════════════════ -->
+            <section id="section-activity" class="section-scope d-none">
+                <div class="row g-4 mb-4">
+                    <div class="col-lg-8">
+                        <div class="glass-card p-4 h-100">
+                            <h5 class="fw-bold mb-1">Contribution Velocity</h5>
+                            <p class="text-muted small mb-4">Recent 35-day push activity across repositories</p>
+                            <div id="heatmap" class="heatmap-modern"></div>
+                            <div class="d-flex justify-content-between mt-3 text-muted small align-items-center">
+                                <span>Last 35 days</span>
+                                <div class="d-flex align-items-center gap-1">
+                                    <span>Less</span>
+                                    <div class="heat-cell intensity-0" style="animation:none;opacity:1;"></div>
+                                    <div class="heat-cell intensity-1" style="animation:none;opacity:1;"></div>
+                                    <div class="heat-cell intensity-2" style="animation:none;opacity:1;"></div>
+                                    <div class="heat-cell intensity-3" style="animation:none;opacity:1;"></div>
+                                    <div class="heat-cell intensity-4" style="animation:none;opacity:1;"></div>
+                                    <span>More</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="glass-card p-4 h-100">
+                            <h5 class="fw-bold mb-4">Developer Radar</h5>
+                            <canvas id="dnaRadar" height="260"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="glass-card p-4 h-100 text-center">
+                            <h5 class="fw-bold mb-4">Productivity Pattern</h5>
+                            <div class="display-6 fw-bold mb-2" style="color:var(--primary);">
+                                {{ data.productivity_pattern }}
+                            </div>
+                            <p class="text-muted small">Detected from repository push timing and creation frequency.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="glass-card p-4 h-100 text-center">
+                            <h5 class="fw-bold mb-4">Collaboration Level</h5>
+                            <div class="display-6 fw-bold mb-3" style="color:var(--secondary);">
+                                {{ data.metrics.collaboration_level }}
+                            </div>
+                            <div class="d-flex justify-content-center gap-4">
+                                <div>
+                                    <div class="fw-bold fs-5">{{ data.innovation_index }}</div>
+                                    <div class="small text-muted">Innovation</div>
+                                </div>
+                                <div class="vr"></div>
+                                <div>
+                                    <div class="fw-bold fs-5">{{ data.growth_potential.score }}</div>
+                                    <div class="small text-muted">Growth</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══════════════════════════════════
+                 SECTION: TECHNOLOGY
+                 ═══════════════════════════════════ -->
+            <section id="section-technology" class="section-scope d-none">
+
+                <!-- Developer Growth Timeline -->
+                <div class="glass-card p-4 mb-4">
+                    <h5 class="fw-bold mb-1">Technology Evolution Timeline</h5>
+                    <p class="text-muted small mb-4">When you first encountered each language — reveals your growth story</p>
+                    <div class="timeline-modern">
+                        {% for item in data.evolution %}
+                        <div class="timeline-item" style="animation:slideUp 0.4s ease both {{ loop.index0 * 0.08 }}s;opacity:0;">
+                            <div class="timeline-year">{{ item.year }}</div>
+                            <div class="timeline-lang">{{ item.language }}</div>
+                            <div class="text-muted" style="font-size:0.68rem;margin-top:2px;">{{ item.repo }}</div>
+                        </div>
+                        {% endfor %}
+                        {% if not data.evolution %}
+                        <p class="text-muted small">No technology evolution data available.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6">
+                        <div class="glass-card p-4 h-100">
+                            <h5 class="fw-bold mb-4">Language Ecosystem</h5>
+                            <canvas id="langPie" height="260"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="glass-card p-4 h-100">
+                            <h5 class="fw-bold mb-4">Skill Proficiency</h5>
+                            <canvas id="skillRadar" height="260"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Language Distribution Table -->
+                <div class="glass-card p-4">
+                    <h5 class="fw-bold mb-4">Language Distribution Breakdown</h5>
+                    <div class="row g-3">
+                        {% for lang, pct in data.language_distribution.items() %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <span class="fw-semibold small">{{ lang }}</span>
+                                <span class="ms-auto text-muted small">{{ pct }}%</span>
+                            </div>
+                            <div class="dna-bar-track">
+                                <div class="dna-bar-fill dna-builder" style="width:{{ pct }}%;animation-delay:{{ loop.index0 * 0.05 }}s;"></div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══════════════════════════════════
+                 SECTION: REPOSITORIES
+                 ═══════════════════════════════════ -->
+            <section id="section-repos" class="section-scope d-none">
+                <div class="d-flex justify-content-between align-items-end mb-4">
+                    <div>
+                        <h4 class="fw-bold mb-1">Top Repositories</h4>
+                        <p class="text-muted mb-0 small">Ranked by custom Impact Score: Stars×2 + Forks×3 + Open Issues</p>
+                    </div>
+                </div>
+                <div class="row g-4">
+                    {% for r in data.top_repos %}
+                    <div class="col-md-6 col-xl-4">
+                        <div class="repo-card-modern shadow-sm" style="animation-delay:{{ loop.index0 * 0.07 }}s;">
+                            <div class="repo-header">
+                                <h6 class="fw-bold mb-2">
+                                    <a href="{{ r.html_url }}" target="_blank" class="text-decoration-none text-dark">{{ r.name }}</a>
+                                </h6>
+                                <p class="text-muted small mb-0" style="min-height:38px;overflow:hidden;">
+                                    {{ r.description or 'No description provided' }}
+                                </p>
+                            </div>
+                            <div class="repo-footer">
+                                <div class="d-flex gap-3">
+                                    <span class="small fw-semibold">&#9733; {{ r.stars }}</span>
+                                    <span class="small fw-semibold text-muted">{{ r.forks }} forks</span>
+                                </div>
+                                <span class="badge bg-light text-dark border rounded-pill px-2 small">{{ r.language or 'N/A' }}</span>
+                            </div>
+                            <div class="p-2 text-center" style="background:rgba(99,102,241,0.06);">
+                                <span class="small fw-bold" style="color:var(--primary);">Impact: {{ r.impact_score }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <!-- ═══════════════════════════════════
+                 SECTION: PATTERNS  (NEW)
+                 ═══════════════════════════════════ -->
+            <section id="section-patterns" class="section-scope d-none">
+                <div class="mb-4">
+                    <h4 class="fw-bold mb-1">Coding Patterns</h4>
+                    <p class="text-muted small">Unique analytics derived from your repository history</p>
+                </div>
+
+                <div class="row g-4 mb-4">
+                    <!-- Productivity Pattern -->
+                    <div class="col-md-6 col-lg-4">
+                        <div class="pattern-card h-100" style="animation-delay:0.05s;">
+                            <div class="insight-icon mb-3" style="background:rgba(99,102,241,0.1);">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                            </div>
+                            <h6 class="fw-bold mb-1">Coding Rhythm</h6>
+                            <div class="fw-bold mb-2" style="font-size:1.25rem;color:var(--primary);">{{ data.productivity_pattern }}</div>
+                            <p class="text-muted small mb-0">Detected from repository push and creation timing patterns.</p>
+                        </div>
+                    </div>
+
+                    <!-- Complexity Level -->
+                    <div class="col-md-6 col-lg-4">
+                        <div class="pattern-card h-100" style="animation-delay:0.1s;">
+                            <div class="insight-icon mb-3" style="background:rgba(168,85,247,0.1);">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                            </div>
+                            <h6 class="fw-bold mb-1">Project Depth</h6>
+                            <div class="fw-bold mb-2" style="font-size:1.25rem;color:var(--secondary);">{{ data.metrics.complexity_level }}</div>
+                            <p class="text-muted small mb-0">Estimated from repo size, language count, and documentation quality.</p>
+                        </div>
+                    </div>
+
+                    <!-- Personality -->
+                    <div class="col-md-6 col-lg-4">
+                        <div class="pattern-card h-100" style="animation-delay:0.15s;">
+                            <div class="insight-icon mb-3" style="background:rgba(244,63,94,0.1);">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                            </div>
+                            <h6 class="fw-bold mb-1">Developer Personality</h6>
+                            <div class="fw-bold mb-2" style="font-size:1.25rem;color:var(--accent);">{{ data.metrics.personality }}</div>
+                            <p class="text-muted small mb-0">Based on language breadth, repo habits, and contribution frequency.</p>
+                        </div>
+                    </div>
+
+                    <!-- Project Diversity -->
+                    <div class="col-md-6 col-lg-4">
+                        <div class="pattern-card h-100" style="animation-delay:0.2s;">
+                            <div class="insight-icon mb-3" style="background:rgba(16,185,129,0.1);">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 012 2v7M11 18H8a2 2 0 01-2-2V9"/></svg>
+                            </div>
+                            <h6 class="fw-bold mb-1">Project Diversity</h6>
+                            <div class="fw-bold mb-2" style="font-size:1.25rem;color:#047857;">{{ data.metrics.diversity_index }}%</div>
+                            <p class="text-muted small mb-0">Ratio of unique programming languages to total repositories.</p>
+                        </div>
+                    </div>
+
+                    <!-- Growth Potential -->
+                    <div class="col-md-6 col-lg-4">
+                        <div class="pattern-card h-100" style="animation-delay:0.25s;">
+                            <div class="insight-icon mb-3" style="background:rgba(245,158,11,0.1);">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 16l4-8 4 4 4-6"/></svg>
+                            </div>
+                            <h6 class="fw-bold mb-1">Growth Trajectory</h6>
+                            <div class="fw-bold mb-2" style="font-size:1.25rem;color:#d97706;">{{ data.growth_potential.level }}</div>
+                            <p class="text-muted small mb-0">Score: {{ data.growth_potential.score }} — Based on followers, repos, and stars.</p>
+                        </div>
+                    </div>
+
+                    <!-- Collaboration -->
+                    <div class="col-md-6 col-lg-4">
+                        <div class="pattern-card h-100" style="animation-delay:0.3s;">
+                            <div class="insight-icon mb-3" style="background:rgba(59,130,246,0.1);">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+                            </div>
+                            <h6 class="fw-bold mb-1">Collaboration Style</h6>
+                            <div class="fw-bold mb-2" style="font-size:1.15rem;color:#1d4ed8;">{{ data.metrics.collaboration_level }}</div>
+                            <p class="text-muted small mb-0">Estimated from forks, open issues, and watcher count.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══════════════════════════════════
+                 SECTION: INSIGHTS
+                 ═══════════════════════════════════ -->
+            <section id="section-insights" class="section-scope d-none">
+                <div class="glass-card p-4 p-md-5">
+                    <div class="text-center mb-5">
+                        <div class="d-inline-flex p-3 rounded-3 mb-3" style="background:rgba(99,102,241,0.1);">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        </div>
+                        <h3 class="fw-bold" style="letter-spacing:-0.01em;">Smart Insights</h3>
+                        <p class="text-muted">Behavioral analysis from your public GitHub activity</p>
+                    </div>
+
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8">
+
+                            {% for insight in data.insights %}
+                            <div class="insight-list-item" style="animation-delay:{{ loop.index0 * 0.08 }}s;">
+                                <div class="insight-bullet">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                                </div>
+                                <p class="mb-0 fw-medium">{{ insight }}</p>
+                            </div>
+                            {% endfor %}
+
+                            <div class="insight-list-item" style="animation-delay:{{ data.insights|length * 0.08 }}s;">
+                                <div class="insight-bullet">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                                </div>
+                                <p class="mb-0 fw-medium">
+                                    Career Prediction: Most suitable for
+                                    <span class="career-pill ms-1">{{ data.career_role }}</span> roles.
+                                </p>
+                            </div>
+
+                            <div class="insight-list-item" style="animation-delay:{{ (data.insights|length + 1) * 0.08 }}s;">
+                                <div class="insight-bullet">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                                </div>
+                                <p class="mb-0 fw-medium">
+                                    Productivity Pattern: You operate as a
+                                    <strong>{{ data.productivity_pattern }}</strong> — coding time analysis from repository activity.
+                                </p>
+                            </div>
+
+                            <div class="insight-list-item" style="animation-delay:{{ (data.insights|length + 2) * 0.08 }}s;">
+                                <div class="insight-bullet">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                                </div>
+                                <p class="mb-0 fw-medium">
+                                    Developer Personality: Classified as
+                                    <strong>{{ data.metrics.personality }}</strong> —
+                                    {{ data.metrics.collaboration_level }}.
+                                </p>
+                            </div>
+
+                            {% if data.evolution %}
+                            <div class="insight-list-item" style="animation-delay:{{ (data.insights|length + 3) * 0.08 }}s;">
+                                <div class="insight-bullet">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                                </div>
+                                <p class="mb-0 fw-medium">
+                                    Technology Direction: First language encountered was
+                                    <strong>{{ data.evolution[0].language }}</strong> ({{ data.evolution[0].year }}).
+                                    {% if data.evolution|length > 1 %}
+                                    Most recently added <strong>{{ data.evolution[-1].language }}</strong> ({{ data.evolution[-1].year }}) to the stack.
+                                    {% endif %}
+                                </p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    window.dashboardData = {{ data|tojson }};
+</script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
