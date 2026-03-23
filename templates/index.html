@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitInsight — Developer Intelligence</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<!-- ── Navbar ── -->
+<header class="bg-glass shadow-sm sticky-top">
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand text-decoration-none" href="/">
+                <span class="gradient-text fs-3" style="font-weight:800;letter-spacing:-0.02em;">GitInsight</span>
+            </a>
+            <div class="ms-auto d-flex align-items-center gap-3">
+                <span class="badge bg-light text-primary border px-3 py-2 rounded-pill small fw-semibold">v2.0 Beta</span>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<!-- ── Hero ── -->
+<main>
+<section class="py-5 overflow-hidden">
+    <div class="container">
+        <div class="row align-items-center g-5">
+
+            <!-- Left: Input + Headline -->
+            <div class="col-lg-6 animate-slide-in">
+                <div class="mb-3">
+                    <span class="badge rounded-pill px-3 py-2 fw-semibold"
+                          style="background:rgba(99,102,241,0.1);color:var(--primary);font-size:0.78rem;letter-spacing:0.04em;">
+                        DEVELOPER ANALYTICS PLATFORM
+                    </span>
+                </div>
+
+                <h1 class="fw-bold mb-3" style="font-size:clamp(2rem,5vw,3rem);line-height:1.15;letter-spacing:-0.02em;">
+                    Decode Your<br>
+                    <span class="gradient-text">Developer DNA</span>
+                </h1>
+
+                <p class="text-muted mb-4" style="font-size:1.05rem;max-width:440px;">
+                    Deep insights into coding patterns, technology evolution, and professional personality — beyond what GitHub shows.
+                </p>
+
+                <!-- Search Form -->
+                <div class="glass-card p-4 mb-4">
+                    <form id="analyzerForm">
+                        <label class="form-label fw-bold text-muted small text-uppercase mb-2" style="letter-spacing:0.07em;">
+                            GitHub Username
+                        </label>
+                        <div class="input-group mb-2">
+                            <input type="text"
+                                   class="form-control form-control-lg border-0 bg-light px-4"
+                                   name="github_username"
+                                   required
+                                   placeholder="e.g. torvalds"
+                                   id="usernameInput"
+                                   style="border-radius:12px 0 0 12px;">
+                            <button class="btn btn-modern px-4" id="analyzeBtn" type="submit"
+                                    style="border-radius:0 12px 12px 0;">
+                                Analyze
+                            </button>
+                        </div>
+
+                        <!-- Recent searches -->
+                        <div id="searchHistory" class="d-flex flex-wrap gap-2 mt-2"></div>
+
+                        <!-- Spinner -->
+                        <div id="loadingSpinner" class="d-none mt-3">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="spinner-grow text-primary spinner-grow-sm" role="status"></div>
+                                <span class="text-muted small fw-medium">Sequencing developer genome…</span>
+                            </div>
+                        </div>
+
+                        <!-- Error -->
+                        <div id="errorMsg" class="alert alert-danger mt-3 d-none border-0 shadow-sm mb-0" style="border-radius:12px;"></div>
+                    </form>
+                </div>
+
+                <!-- Stats row -->
+                <div class="d-flex gap-4 align-items-center">
+                    <div class="text-center">
+                        <div class="fw-bold mb-0" style="font-size:1.4rem;">8+</div>
+                        <div class="small text-muted">Unique Metrics</div>
+                    </div>
+                    <div class="vr"></div>
+                    <div class="text-center">
+                        <div class="fw-bold mb-0" style="font-size:1.4rem;">Visual</div>
+                        <div class="small text-muted">Timeline</div>
+                    </div>
+                    <div class="vr"></div>
+                    <div class="text-center">
+                        <div class="fw-bold mb-0" style="font-size:1.4rem;">100%</div>
+                        <div class="small text-muted">Free</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: animated visual -->
+            <div class="col-lg-6 d-none d-lg-block animate-fade-in">
+                <div class="commit-grid-section position-relative">
+
+                    <!-- Commit Grid -->
+                    <div class="mb-1 small fw-semibold text-muted" style="font-size:0.72rem;letter-spacing:0.06em;text-transform:uppercase;">Commit Activity</div>
+                    <div class="commit-grid-wrap mb-4" id="heroCommitGrid"></div>
+
+                    <!-- Repo Growth Bars -->
+                    <div class="mb-1 small fw-semibold text-muted" style="font-size:0.72rem;letter-spacing:0.06em;text-transform:uppercase;">Repository Growth by Year</div>
+                    <div id="heroGrowthBars"></div>
+
+                    <!-- Floating badge -->
+                    <div class="position-absolute top-0 end-0 m-3 glass-card px-3 py-2 animate-bounce" style="border-radius:30px;z-index:3;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="rounded-circle bg-success" style="width:8px;height:8px;"></div>
+                            <span class="small fw-bold">Advanced Architect</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ── Feature Cards ── -->
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold" style="letter-spacing:-0.01em;">What's Inside?</h2>
+            <p class="text-muted">Advanced heuristics to map developer capabilities</p>
+        </div>
+        <div class="row g-4 stagger-children">
+            <div class="col-md-4 animate-slide-up" style="opacity:0;">
+                <div class="p-4 rounded-4 border h-100 transition-all hover-shadow bg-white">
+                    <div class="d-inline-flex p-3 rounded-3 mb-3" style="background:rgba(99,102,241,0.1);">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                    </div>
+                    <h5 class="fw-bold mb-2">Personality Mapping</h5>
+                    <p class="text-muted small mb-0">Classify into 5 unique developer archetypes based on contribution patterns and repository habits.</p>
+                </div>
+            </div>
+            <div class="col-md-4 animate-slide-up" style="opacity:0;">
+                <div class="p-4 rounded-4 border h-100 transition-all hover-shadow bg-white">
+                    <div class="d-inline-flex p-3 rounded-3 mb-3" style="background:rgba(168,85,247,0.1);">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><path d="M12 20V10M6 20V4M18 20V16"/></svg>
+                    </div>
+                    <h5 class="fw-bold mb-2">Technology Evolution</h5>
+                    <p class="text-muted small mb-0">Visualize your journey across languages and stacks — older repos vs recent ones reveal technology shifts.</p>
+                </div>
+            </div>
+            <div class="col-md-4 animate-slide-up" style="opacity:0;">
+                <div class="p-4 rounded-4 border h-100 transition-all hover-shadow bg-white">
+                    <div class="d-inline-flex p-3 rounded-3 mb-3" style="background:rgba(244,63,94,0.1);">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                    </div>
+                    <h5 class="fw-bold mb-2">Coding Rhythm</h5>
+                    <p class="text-muted small mb-0">Detect whether you code at night, on weekends, or in focused bursts — your productivity pattern revealed.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── Unique Analytics Section ── -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="badge rounded-pill px-3 py-2 mb-3 fw-semibold"
+                  style="background:rgba(99,102,241,0.1);color:var(--primary);font-size:0.78rem;">
+                WHAT GITHUB DOESN'T SHOW YOU
+            </span>
+            <h2 class="fw-bold" style="letter-spacing:-0.01em;">Unique Analytics</h2>
+            <p class="text-muted">Insights derived from your public activity that GitHub never surfaces</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <div class="insight-card h-100" style="animation-delay:0.05s;">
+                    <div class="insight-icon" style="background:rgba(99,102,241,0.1);">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 16l4-8 4 4 4-6"/></svg>
+                    </div>
+                    <h6 class="fw-bold mb-1">Developer Growth Timeline</h6>
+                    <p class="text-muted small mb-0">Repository creation by year reveals your growth patterns over time.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="insight-card h-100" style="animation-delay:0.1s;">
+                    <div class="insight-icon" style="background:rgba(168,85,247,0.1);">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
+                    </div>
+                    <h6 class="fw-bold mb-1">Technology Direction</h6>
+                    <p class="text-muted small mb-0">Compare older vs recent repos to detect technology shifts and focus areas.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="insight-card h-100" style="animation-delay:0.15s;">
+                    <div class="insight-icon" style="background:rgba(244,63,94,0.1);">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32"/></svg>
+                    </div>
+                    <h6 class="fw-bold mb-1">Project Diversity</h6>
+                    <p class="text-muted small mb-0">Language diversity index calculated across all repositories.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="insight-card h-100" style="animation-delay:0.2s;">
+                    <div class="insight-icon" style="background:rgba(16,185,129,0.1);">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M12 22V12M12 12C12 12 7 9.5 7 6a5 5 0 0110 0c0 3.5-5 6-5 6z"/></svg>
+                    </div>
+                    <h6 class="fw-bold mb-1">Coding Rhythm</h6>
+                    <p class="text-muted small mb-0">Analyze commit timing to detect working patterns: Night Coder, Weekend Builder, or Burst Developer.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="insight-card h-100" style="animation-delay:0.25s;">
+                    <div class="insight-icon" style="background:rgba(245,158,11,0.1);">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+                    </div>
+                    <h6 class="fw-bold mb-1">Project Depth</h6>
+                    <p class="text-muted small mb-0">Complexity estimated from repo size, stars, commits, and documentation presence.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="insight-card h-100" style="animation-delay:0.3s;">
+                    <div class="insight-icon" style="background:rgba(59,130,246,0.1);">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+                    </div>
+                    <h6 class="fw-bold mb-1">Developer DNA</h6>
+                    <p class="text-muted small mb-0">Composite score across Builder, Collaborator, Innovator, and Consistency traits.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</main>
+
+<footer class="py-4 border-top bg-white">
+    <div class="container text-center">
+        <p class="text-muted mb-0 small">© 2026 GitInsight Analyzer — Built for developers by developers.</p>
+    </div>
+</footer>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
