@@ -2,14 +2,20 @@ from flask import Flask, render_template, request, redirect, url_for, session, j
 import requests
 import os
 from datetime import datetime, timedelta
+<<<<<<< HEAD
 from sql_engine import init_db, save_analysis, get_sql_insights
+=======
+>>>>>>> 14d445a65494d43374749e13f4b2d443b2f616ef
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("DIL_SECRET_KEY", "dev-secret-key")
 
+<<<<<<< HEAD
 # Initialize the SQL Database on startup
 init_db()
 
+=======
+>>>>>>> 14d445a65494d43374749e13f4b2d443b2f616ef
 
 def login_required():
     return True
@@ -405,12 +411,15 @@ def analyze():
         "insights": insights,
     }
 
+<<<<<<< HEAD
     # SQL Persistence and Novel Comparative Analytics
     save_analysis(username, data)
     sql_insights = get_sql_insights(username)
     if sql_insights:
         data["sql_oracle"] = sql_insights
 
+=======
+>>>>>>> 14d445a65494d43374749e13f4b2d443b2f616ef
     session["analysis"] = data
     return jsonify({"success": True, "redirect": url_for("dashboard")})
 
