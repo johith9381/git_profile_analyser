@@ -45,10 +45,6 @@
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                         Insights
                     </a>
-                    <a href="#" class="nav-link-modern" data-section="sql-oracle">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                        SQL Oracle
-                    </a>
                 </nav>
 
                 <!-- Profile mini card in sidebar -->
@@ -85,7 +81,6 @@
                     <span class="mobile-nav-pill" data-section="repos">Repositories</span>
                     <span class="mobile-nav-pill" data-section="patterns">Patterns</span>
                     <span class="mobile-nav-pill" data-section="insights">Insights</span>
-                    <span class="mobile-nav-pill" data-section="sql-oracle">SQL Oracle</span>
                 </div>
             </div>
 
@@ -238,66 +233,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-            </section>
-
-            <!-- ═══════════════════════════════════
-                 SECTION: SQL ORACLE (NOVEL)
-                 ═══════════════════════════════════ -->
-            <section id="section-sql-oracle" class="section-scope d-none">
-                <div class="glass-card p-5 overflow-hidden position-relative">
-                    <!-- Removed background decoration that was causing text overlap -->
-
-                    <div class="text-center mb-5">
-                        <div class="d-inline-flex p-3 rounded-4 mb-4" style="background:rgba(99,102,241,0.1); box-shadow: 0 8px 20px rgba(99,102,241,0.1);">
-                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                        </div>
-                        <h2 class="fw-bold mb-3" style="letter-spacing:-0.02em; font-size: 2.8rem; color: var(--text-dark);">The SQL Oracle</h2>
-                        <div class="mx-auto" style="max-width: 700px;">
-                            <p class="text-muted fs-4 mb-0" style="line-height: 1.4;">Novel comparative analytics powered by persistent SQL aggregations</p>
-                        </div>
-                    </div>
-
-                    {% if data.sql_oracle %}
-                    <div class="row g-4 justify-content-center">
-                        <div class="col-md-6 col-lg-4">
-                            <div class="pattern-card text-center">
-                                <div class="metric-label mb-2">Global Standing</div>
-                                <div class="fw-bold gradient-text" style="font-size:3rem;">{{ data.sql_oracle.rank_percentile }}%</div>
-                                <p class="small text-muted mb-0">Ranked higher than {{ data.sql_oracle.rank_percentile }}% of analyzed developers.</p>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6 col-lg-4">
-                            <div class="pattern-card text-center">
-                                <div class="metric-label mb-2">Ecosystem Rarity</div>
-                                <div class="fw-bold" style="font-size:1.5rem;color:var(--secondary);">{{ data.sql_oracle.rare_language_status }}</div>
-                                <p class="small text-muted mt-2 mb-0">Based on the popularity of your top language in our database.</p>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-8">
-                            <div class="glass-card p-4 mt-2" style="background:rgba(99,102,241,0.03); border: 1px dashed rgba(99,102,241,0.3);">
-                                <div class="d-flex align-items-start gap-3">
-                                    <div class="p-2 rounded bg-white shadow-sm">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                                    </div>
-                                    <div>
-                                        <h6 class="fw-bold mb-1">Comparative Intelligence</h6>
-                                        <p class="mb-0 text-muted small">{{ data.sql_oracle.comparison_text }}</p>
-                                        <div class="mt-2 small fw-bold text-primary">
-                                            Dataset: {{ data.sql_oracle.total_analyzed }} unique profiles analyzed.
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% else %}
-                    <div class="text-center py-5">
-                        <p class="text-muted italic">Insufficient data for SQL comparative analytics. Analyze more profiles to unlock global benchmarks!</p>
-                    </div>
-                    {% endif %}
                 </div>
             </section>
 

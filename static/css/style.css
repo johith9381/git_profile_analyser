@@ -216,6 +216,9 @@ body {
   border: 15px solid #e2e8f0;
   border-radius: 50%;
   position: absolute;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
 }
 
 .gauge-fill {
@@ -224,6 +227,9 @@ body {
   border: 15px solid var(--primary);
   border-radius: 50%;
   position: absolute;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
   clip-path: polygon(0 0, 100% 0, 100% 50%, 0 50%);
   transform: rotate(-90deg);
   transition: transform 1.5s cubic-bezier(0.1,0.7,0.1,1);
