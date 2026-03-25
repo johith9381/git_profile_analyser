@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitInsight — Developer Intelligence</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================================
+           GitInsight — Embedded Styles
+           ============================================================ */
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --secondary: #a855f7;
+            --accent: #f43f5e;
+            --green: #10b981;
+            --amber: #f59e0b;
+            --blue: #3b82f6;
+            --bg-light: #f0f2ff;
+            --bg-surface: #ffffff;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --glass: rgba(255, 255, 255, 0.72);
+            --glass-border: rgba(255, 255, 255, 0.55);
+            --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.07);
+            --shadow: 0 4px 12px -1px rgb(99 102 241 / 0.12), 0 2px 6px -2px rgb(0 0 0 / 0.06);
+            --shadow-lg: 0 10px 30px -3px rgb(99 102 241 / 0.15), 0 4px 10px -4px rgb(0 0 0 / 0.08);
+            --shadow-xl: 0 25px 50px -5px rgb(99 102 241 / 0.22), 0 8px 20px -6px rgb(0 0 0 / 0.1);
+            --radius: 20px;
+            --radius-sm: 12px;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            background-image:
+                radial-gradient(ellipse 80% 50% at 20% -10%, rgba(99,102,241,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 40% at 80% 110%, rgba(168,85,247,0.09) 0%, transparent 60%);
+            color: var(--text-dark);
+            font-family: 'Inter', system-ui, sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideInLeft { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fillBar { from { width: 0; } }
+        @keyframes gridPop { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+
+        .animate-fade-in { animation: fadeIn 0.6s ease-out forwards; }
+        .animate-slide-in { animation: slideInLeft 0.5s ease-out forwards; }
+        .animate-bounce { animation: pulse 3s infinite; }
+        .animate-slide-up { animation: slideUp 0.5s ease-out forwards; }
+        .animate-float { animation: float 4s ease-in-out infinite; }
+
+        /* Glass UI */
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+        }
+        .glass-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-xl); }
+
+        .gradient-text {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+        }
+        .gradient-bg { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); }
+
+        .btn-modern {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white; border: none; padding: 12px 24px; border-radius: 12px; font-weight: 600;
+            transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(99,102,241,0.3);
+        }
+        .btn-modern:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(99,102,241,0.4); color: white; }
+
+        /* Sidebar & Nav */
+        .sidebar-modern {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--glass-border);
+            height: 100vh; position: sticky; top: 0; padding: 2rem 1rem;
+        }
+        .nav-link-modern {
+            display: flex; align-items: center; padding: 0.8rem 1.2rem; color: var(--text-muted);
+            border-radius: 12px; margin-bottom: 0.5rem; transition: all 0.2s ease;
+            text-decoration: none; font-weight: 500; gap: 0.5rem;
+        }
+        .nav-link-modern:hover { background: rgba(99,102,241,0.1); color: var(--primary); transform: translateX(5px); }
+        .nav-link-modern.active { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; box-shadow: 0 4px 15px rgba(99,102,241,0.3); }
+
+        /* Dashboard Components */
+        .metric-value { font-size: 2.5rem; font-weight: 800; margin-bottom: 0; line-height: 1; }
+        .metric-label { color: var(--text-muted); font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+        
+        .gauge-container { width: 150px; height: 75px; position: relative; overflow: hidden; margin: 0 auto; }
+        .gauge-bg { width: 150px; height: 150px; border: 15px solid #e2e8f0; border-radius: 50%; position: absolute; top: 0; left: 0; box-sizing: border-box; }
+        .gauge-fill { width: 150px; height: 150px; border: 15px solid var(--primary); border-radius: 50%; position: absolute; top: 0; left: 0; box-sizing: border-box; clip-path: polygon(0 0, 100% 0, 100% 50%, 0 50%); transform: rotate(-90deg); transition: transform 1.5s cubic-bezier(0.1,0.7,0.1,1); }
+
+        .timeline-modern { display: flex; justify-content: space-between; position: relative; padding: 2rem 0; flex-wrap: wrap; gap: 1rem; }
+        .timeline-modern::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--primary), var(--secondary)); z-index: 1; }
+        .timeline-item { position: relative; z-index: 2; background: white; padding: 10px 14px; border-radius: 12px; box-shadow: var(--shadow); text-align: center; min-width: 100px; transition: all 0.3s ease; border: 1px solid rgba(99,102,241,0.08); opacity: 0; }
+        .timeline-item::after { content: ''; position: absolute; bottom: -9px; left: 50%; transform: translateX(-50%); width: 10px; height: 10px; border-radius: 50%; background: var(--primary); box-shadow: 0 0 0 3px white; }
+        .timeline-item:hover { transform: scale(1.1); box-shadow: var(--shadow-lg); }
+        .timeline-year { font-weight: 800; color: var(--primary); font-size: 0.8rem; font-family: monospace; }
+        .timeline-lang { font-weight: 600; font-size: 0.9rem; }
+
+        .badge-personality { padding: 10px 20px; border-radius: 30px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; box-shadow: var(--shadow); }
+        .badge-explorer { background: #dcfce7; color: #15803d; }
+        .badge-specialist { background: #dbeafe; color: #1d4ed8; }
+        .badge-maintainer { background: #fef9c3; color: #a16207; }
+        .badge-experimenter { background: #f3e8ff; color: #7e22ce; }
+        .badge-architect { background: #fee2e2; color: #b91c1c; }
+
+        .repo-card-modern { border: 1px solid rgba(99,102,241,0.1) !important; background: white; border-radius: 16px; overflow: hidden; transition: all 0.3s ease; height: 100%; animation: slideUp 0.5s ease-out both; opacity: 0; }
+        .repo-card-modern:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 20px 40px rgba(0,0,0,0.08) !important; }
+        .repo-header { padding: 1.5rem; border-bottom: 1px solid #f1f5f9; }
+        .repo-footer { padding: 1rem 1.5rem; background: #f8fafc; display: flex; justify-content: space-between; align-items: center; }
+
+        .heatmap-modern { display: flex; flex-wrap: wrap; gap: 4px; }
+        .heat-cell { width: 14px; height: 14px; border-radius: 3px; transition: transform 0.2s ease; animation: gridPop 0.3s ease-out both; opacity: 0; }
+        .heat-cell:hover { transform: scale(1.5); z-index: 10; }
+        .intensity-0 { background: #e2e8f0; }
+        .intensity-1 { background: #c7d2fe; }
+        .intensity-2 { background: #818cf8; }
+        .intensity-3 { background: #6366f1; }
+        .intensity-4 { background: #4338ca; }
+
+        .commit-grid-section { background: rgba(255,255,255,0.55); border: 1px solid var(--glass-border); border-radius: 20px; padding: 1.5rem; backdrop-filter: blur(8px); }
+        .commit-grid-wrap { display: flex; gap: 4px; justify-content: flex-start; overflow: hidden; }
+        .commit-col { display: flex; flex-direction: column; gap: 4px; }
+        .commit-dot { width: 11px; height: 11px; border-radius: 2px; background: #e2e8f0; animation: gridPop 0.4s ease-out both; }
+        .commit-dot.active { background: linear-gradient(135deg, var(--primary), var(--secondary)); }
+        .commit-dot.semi { background: var(--primary-light); opacity: 0.6; }
+
+        .growth-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 7px; }
+        .growth-bar-label { font-size: 0.7rem; font-family: monospace; color: var(--text-muted); width: 32px; text-align: right; flex-shrink: 0; }
+        .growth-bar-track { flex: 1; height: 9px; background: #e2e8f0; border-radius: 9px; overflow: hidden; }
+        .growth-bar-fill { height: 100%; border-radius: 9px; background: linear-gradient(90deg, var(--primary), var(--secondary)); transform-origin: left; animation: fillBar 1.4s cubic-bezier(0.4,0,0.2,1) both; }
+
+        .dna-bar-row { margin-bottom: 12px; }
+        .dna-bar-label { display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 600; margin-bottom: 4px; color: var(--text-dark); }
+        .dna-bar-track { height: 9px; background: #e2e8f0; border-radius: 9px; overflow: hidden; }
+        .dna-bar-fill { height: 100%; border-radius: 9px; animation: fillBar 1.4s cubic-bezier(0.4,0,0.2,1) both; }
+        .dna-builder { background: linear-gradient(90deg, #6366f1, #818cf8); }
+        .dna-collab { background: linear-gradient(90deg, #a855f7, #c084fc); }
+        .dna-innovator { background: linear-gradient(90deg, #f43f5e, #fb7185); }
+        .dna-consist { background: linear-gradient(90deg, #10b981, #34d399); }
+
+        .pattern-card { background: linear-gradient(135deg, rgba(99,102,241,0.06), rgba(168,85,247,0.06)); border: 1px solid rgba(99,102,241,0.12); border-radius: 16px; padding: 1.5rem; transition: all 0.3s ease; animation: slideUp 0.5s ease-out both; opacity: 0; }
+        .mobile-nav-pills { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+        .mobile-nav-pills::-webkit-scrollbar { display: none; }
+        .mobile-nav-pill { flex-shrink: 0; padding: 5px 13px; border-radius: 20px; font-size: 0.78rem; font-weight: 600; cursor: pointer; border: 1px solid rgba(99,102,241,0.2); color: var(--text-muted); background: white; transition: all 0.2s; white-space: nowrap; }
+        .mobile-nav-pill.active { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border-color: transparent; }
+
+        .profile-avatar { width: 110px; height: 110px; border-radius: 50%; border: 4px solid white; box-shadow: 0 0 0 3px var(--primary-light), var(--shadow-lg); object-fit: cover; }
+        .career-pill { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 7px 18px; border-radius: 30px; font-weight: 700; font-size: 0.88rem; display: inline-block; box-shadow: 0 4px 15px rgba(99,102,241,0.3); }
+
+        .insight-list-item { display: flex; align-items: flex-start; gap: 12px; padding: 1rem 0; border-bottom: 1px solid #f1f5f9; animation: slideUp 0.5s ease-out both; opacity: 0; }
+        .insight-bullet { width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+
+        .d-none { display: none !important; }
+        .section-scope { animation: fadeIn 0.4s ease-out both; }
+    </style>
+</head>
+<body>
+
+<!-- ── Landing Page View ── -->
+<div id="search-view">
+    <header class="bg-glass shadow-sm sticky-top">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container">
+                <a class="navbar-brand text-decoration-none" href="#">
+                    <span class="gradient-text fs-3" style="font-weight:800;letter-spacing:-0.02em;">GitInsight</span>
+                </a>
+                <div class="ms-auto d-flex align-items-center gap-3">
+                    <span class="badge bg-light text-primary border px-3 py-2 rounded-pill small fw-semibold">v2.0 Standalone</span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="py-5 overflow-hidden">
+            <div class="container">
+                <div class="row align-items-center g-5">
+                    <div class="col-lg-6 animate-slide-in">
+                        <div class="mb-3">
+                            <span class="badge rounded-pill px-3 py-2 fw-semibold" style="background:rgba(99,102,241,0.1);color:var(--primary);font-size:0.78rem;letter-spacing:0.04em;">DEVELOPER ANALYTICS PLATFORM</span>
+                        </div>
+                        <h1 class="fw-bold mb-3" style="font-size:clamp(2rem,5vw,3rem);line-height:1.15;letter-spacing:-0.02em;">Decode Your<br><span class="gradient-text">Developer DNA</span></h1>
+                        <p class="text-muted mb-4" style="font-size:1.05rem;max-width:440px;">Deep insights into coding patterns, technology evolution, and professional personality — beyond what GitHub shows.</p>
+                        <div class="glass-card p-4 mb-4">
+                            <form id="analyzerForm">
+                                <label class="form-label fw-bold text-muted small text-uppercase mb-2" style="letter-spacing:0.07em;">GitHub Username</label>
+                                <div class="input-group mb-2">
+                                    <input type="text" class="form-control form-control-lg border-0 bg-light px-4" name="github_username" required placeholder="e.g. torvalds" id="usernameInput" style="border-radius:12px 0 0 12px;">
+                                    <button class="btn btn-modern px-4" id="analyzeBtn" type="submit" style="border-radius:0 12px 12px 0;">Analyze</button>
+                                </div>
+                                <div id="searchHistory" class="d-flex flex-wrap gap-2 mt-2"></div>
+                                <div id="loadingSpinner" class="d-none mt-3">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="spinner-grow text-primary spinner-grow-sm" role="status"></div>
+                                        <span class="text-muted small fw-medium">Sequencing developer genome…</span>
+                                    </div>
+                                </div>
+                                <div id="errorMsg" class="alert alert-danger mt-3 d-none border-0 shadow-sm mb-0" style="border-radius:12px;"></div>
+                            </form>
+                        </div>
+                        <div class="d-flex gap-4 align-items-center">
+                            <div class="text-center">
+                                <div class="fw-bold mb-0" style="font-size:1.4rem;">8+</div>
+                                <div class="small text-muted">Unique Metrics</div>
+                            </div>
+                            <div class="vr"></div>
+                            <div class="text-center">
+                                <div class="fw-bold mb-0" style="font-size:1.4rem;">Visual</div>
+                                <div class="small text-muted">Timeline</div>
+                            </div>
+                            <div class="vr"></div>
+                            <div class="text-center">
+                                <div class="fw-bold mb-0" style="font-size:1.4rem;">100%</div>
+                                <div class="small text-muted">Client-Side</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 d-none d-lg-block animate-fade-in">
+                        <div class="commit-grid-section position-relative">
+                            <div class="mb-1 small fw-semibold text-muted" style="font-size:0.72rem;letter-spacing:0.06em;text-transform:uppercase;">Commit Activity</div>
+                            <div class="commit-grid-wrap mb-4" id="heroCommitGrid"></div>
+                            <div class="mb-1 small fw-semibold text-muted" style="font-size:0.72rem;letter-spacing:0.06em;text-transform:uppercase;">Repository Growth by Year</div>
+                            <div id="heroGrowthBars"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<!-- ── Dashboard View ── -->
+<div id="dashboard-view" class="d-none">
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <aside class="col-lg-2 d-none d-lg-block">
+                <div class="sidebar-modern">
+                    <div class="mb-5 px-2">
+                        <a href="#" class="text-decoration-none" id="backToSearch">
+                            <span class="gradient-text fs-4" style="font-weight:800;">GitInsight</span>
+                        </a>
+                    </div>
+                    <nav class="nav flex-column">
+                        <a href="#" class="nav-link-modern active" data-section="overview">Overview</a>
+                        <a href="#" class="nav-link-modern" data-section="activity">Activity</a>
+                        <a href="#" class="nav-link-modern" data-section="technology">Technology</a>
+                        <a href="#" class="nav-link-modern" data-section="repos">Repositories</a>
+                        <a href="#" class="nav-link-modern" data-section="patterns">Patterns</a>
+                        <a href="#" class="nav-link-modern" data-section="insights">Insights</a>
+                    </nav>
+                    <div class="mt-auto pt-4 px-2" id="sidebarProfileCard"></div>
+                </div>
+            </aside>
+
+            <main class="col-lg-10 p-4 p-md-5">
+                <!-- Mobile nav pills -->
+                <div class="d-lg-none mb-4">
+                    <div class="mobile-nav-pills">
+                        <span class="mobile-nav-pill active" data-section="overview">Overview</span>
+                        <span class="mobile-nav-pill" data-section="activity">Activity</span>
+                        <span class="mobile-nav-pill" data-section="technology">Technology</span>
+                        <span class="mobile-nav-pill" data-section="repos">Repositories</span>
+                        <span class="mobile-nav-pill" data-section="patterns">Patterns</span>
+                        <span class="mobile-nav-pill" data-section="insights">Insights</span>
+                    </div>
+                </div>
+
+                <div id="profileHeader"></div>
+
+                <!-- Sections -->
+                <section id="section-overview" class="section-scope"></section>
+                <section id="section-activity" class="section-scope d-none"></section>
+                <section id="section-technology" class="section-scope d-none"></section>
+                <section id="section-repos" class="section-scope d-none"></section>
+                <section id="section-patterns" class="section-scope d-none"></section>
+                <section id="section-insights" class="section-scope d-none"></section>
+            </main>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+/* ============================================================
+   GitInsight Standalone — Analysis Engine
+   ============================================================ */
+
+const GITHUB_API = "https://api.github.com";
+
+// ── Core Analysis Functions ──
+
+async function fetchProfile(username) {
+    const res = await fetch(`${GITHUB_API}/users/${username}`);
+    if (res.status === 404) throw new Error("GitHub user not found.");
+    if (!res.ok) throw new Error("GitHub API limit reached or error.");
+    return await res.json();
+}
+
+async function fetchRepos(username) {
+    const res = await fetch(`${GITHUB_API}/users/${username}/repos?per_page=100&sort=updated`);
+    if (!res.ok) return [];
+    return await res.json();
+}
+
+function languageStats(repos) {
+    const counts = {};
+    repos.forEach(r => {
+        if (r.language) counts[r.language] = (counts[r.language] || 0) + 1;
+    });
+    const total = Object.values(counts).reduce((a, b) => a + b, 0) || 1;
+    const percentages = {};
+    for (let k in counts) percentages[k] = Math.round((counts[k] / total) * 100 * 100) / 100;
+    return { counts, percentages };
+}
+
+function developerMetrics(profile, repos) {
+    const repoCount = repos.length;
+    if (repoCount === 0) return { impact_score: 0, diversity_index: 0, consistency_score: 0, complexity_level: "Beginner", collaboration_level: "Solo Developer", personality: "Explorer" };
+
+    const totalStars = repos.reduce((s, r) => s + r.stargazers_count, 0);
+    const totalForks = repos.reduce((s, r) => s + r.forks_count, 0);
+    const totalIssues = repos.reduce((s, r) => s + r.open_issues_count, 0);
+    const impactScore = (totalStars * 2) + (totalForks * 3) + totalIssues;
+
+    const { counts } = languageStats(repos);
+    const uniqueLangs = Object.keys(counts).length;
+    const diversityIndex = Math.round((uniqueLangs / repoCount) * 1000) / 10;
+
+    const ninetyDaysAgo = new Date(); ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+    const recentUpdates = repos.filter(r => r.pushed_at && new Date(r.pushed_at) >= ninetyDaysAgo).length;
+    const consistencyScore = Math.min(100, Math.round((recentUpdates / Math.max(1, repoCount)) * 100 + (repoCount / 10 * 5)));
+
+    const avgSize = repos.reduce((s, r) => s + r.size, 0) / repoCount;
+    const hasReadme = repos.filter(r => r.description).length;
+    const complexityVal = (avgSize / 1000) + (uniqueLangs * 2) + (hasReadme / repoCount * 10);
+    const complexityLevel = complexityVal > 50 ? "Advanced" : (complexityVal > 20 ? "Intermediate" : "Beginner");
+
+    const totalWatchers = repos.reduce((s, r) => s + r.watchers_count, 0);
+    const collabVal = totalForks + totalIssues + totalWatchers;
+    const collaborationLevel = collabVal > 100 ? "Open Source Contributor" : (collabVal > 20 ? "Collaborative Developer" : "Solo Developer");
+
+    const topLangPct = Math.max(...Object.values(counts)) / repoCount * 100;
+    let personality = "Architect";
+    if (uniqueLangs > 5 && diversityIndex > 50) personality = "Explorer";
+    else if (topLangPct > 70) personality = "Specialist";
+    else if (recentUpdates > 5 && repoCount > 15) personality = "Maintainer";
+    else if (avgSize < 500 && repoCount > 10) personality = "Experimenter";
+
+    return { impact_score: impactScore, diversity_index: diversityIndex, consistency_score: consistencyScore, complexity_level: complexityLevel, collaboration_level: collaborationLevel, personality: personality };
+}
+
+function computeInsights(data) {
+    const insights = [];
+    const counts = data.skill_radar.counts;
+    if (Object.keys(counts).length > 0) {
+        const top = Object.entries(counts).sort((a,b) => b[1] - a[1])[0][0];
+        insights.push(`Strong focus on ${top} projects.`);
+        insights.push(`Most productive language: ${top}.`);
+    }
+    if (data.evolution.length > 0) {
+        insights.push(`Recent activity shows growing interest in ${data.evolution[data.evolution.length-1].language}.`);
+    }
+    if (data.metrics.personality === "Experimenter") insights.push("Developer prefers building small experimental repositories.");
+    if (data.metrics.collaboration_level === "Open Source Contributor") insights.push("Highly collaborative with significant open-source contributions.");
+    return insights;
+}
+
+// ── UI Controller ──
+
+$(function() {
+    // Landing Animations
+    buildHeroAnimation();
+    renderHistory();
+
+    $('#analyzerForm').on('submit', async function(e) {
+        e.preventDefault();
+        const username = $('#usernameInput').val().trim();
+        if (!username) return;
+
+        const btn = $('#analyzeBtn');
+        const spinner = $('#loadingSpinner');
+        const errorBox = $('#errorMsg');
+
+        errorBox.addClass('d-none');
+        btn.prop('disabled', true).addClass('opacity-50');
+        spinner.removeClass('d-none');
+
+        try {
+            const profile = await fetchProfile(username);
+            const repos = await fetchRepos(username);
+            
+            const { counts, percentages } = languageStats(repos);
+            const metrics = developerMetrics(profile, repos);
+            
+            // Evolution
+            const evolution = repos.filter(r => r.created_at && r.language)
+                .sort((a,b) => new Date(a.created_at) - new Date(b.created_at))
+                .reduce((acc, r) => {
+                    if (!acc.seen.has(r.language)) {
+                        acc.seen.add(r.language);
+                        acc.list.push({ year: r.created_at.split('-')[0], language: r.language, repo: r.name });
+                    }
+                    return acc;
+                }, { seen: new Set(), list: [] }).list.slice(0, 5);
+
+            // DNA
+            const totalStars = repos.reduce((s, r) => s + r.stargazers_count, 0);
+            const totalForks = repos.reduce((s, r) => s + r.forks_count, 0);
+            const dna = {
+                Builder: Math.min(100, repos.length * 2 + totalStars * 0.5),
+                Collaborator: Math.min(100, profile.followers * 1 + totalForks * 2),
+                Innovator: Math.min(100, Object.keys(counts).length * 8 + totalStars * 0.2),
+                Consistency: metrics.consistency_score
+            };
+
+            // Top Repos
+            const topRepos = repos.map(r => ({
+                ...r,
+                impact: (r.stargazers_count * 2) + (r.forks_count * 3) + r.open_issues_count
+            })).sort((a,b) => b.impact - a.impact).slice(0, 6);
+
+            const dashboardData = {
+                profile: { avatar_url: profile.avatar_url, username: profile.login, name: profile.name, bio: profile.bio, followers: profile.followers, following: profile.following, public_repos: profile.public_repos, location: profile.location || 'N/A', company: profile.company || 'N/A' },
+                activity_score: profile.followers + repos.length + totalStars,
+                dna,
+                metrics,
+                evolution,
+                language_distribution: percentages,
+                skill_radar: { labels: Object.keys(counts), values: Object.values(counts), counts },
+                top_repos: topRepos,
+                career_role: "Full Stack Developer", // Simplified for standalone
+                productivity_pattern: "Consistent Contributor",
+                innovation_index: Object.keys(counts).length * repos.length,
+                growth_potential: { score: Math.round(profile.followers * 0.5 + repos.length + totalStars * 0.5), level: "Growing Developer" },
+                top_repo_lang: topRepos[0]?.language || "N/A"
+            };
+
+            dashboardData.insights = computeInsights(dashboardData);
+
+    saveHistory(username);
+            renderDashboard(dashboardData);
+        } catch (err) {
+            errorBox.removeClass('d-none').text(err.message);
+        } finally {
+            btn.prop('disabled', false).removeClass('opacity-50');
+            spinner.addClass('d-none');
+        }
+    });
+
+    function saveHistory(u) {
+        let h = JSON.parse(localStorage.getItem('gitHistory') || '[]');
+        if (!h.includes(u)) { h.unshift(u); localStorage.setItem('gitHistory', JSON.stringify(h.slice(0, 5))); }
+        renderHistory();
+    }
+
+    function renderHistory() {
+        const h = JSON.parse(localStorage.getItem('gitHistory') || '[]');
+        $('#searchHistory').empty().append(h.map(u => `<span class="badge bg-light text-muted border px-3 py-2 rounded-pill small" style="cursor:pointer;">${u}</span>`));
+        $('#searchHistory span').on('click', function() { $('#usernameInput').val($(this).text()); $('#analyzerForm').submit(); });
+    }
+
+    function buildHeroAnimation() {
+        const grid = $('#heroCommitGrid');
+        if (!grid.length) return;
+        const activeSet = new Set([2,8,15,16,22,28,29,35,41,47,48,54,60,61,67,73,74,80,86,87,93,99,105,111,112,118,124,130,136,137,143,20,34,55,76,97,118,139,160,11,25,46,68,89,110,131,152]);
+        for (let c = 0; c < 26; c++) {
+            const col = $('<div class="commit-col"></div>');
+            for (let r = 0; r < 7; r++) {
+                const dot = $('<div class="commit-dot"></div>');
+                if (activeSet.has(c*7+r) || Math.random() > 0.75) dot.addClass(Math.random() > 0.9 ? 'semi' : 'active');
+                dot.css('animation-delay', (c*7+r)*0.01+'s');
+                col.append(dot);
+            }
+            grid.append(col);
+        }
+        const bars = $('#heroGrowthBars').empty();
+        [{y:'2021',p:40},{y:'2022',p:65},{y:'2023',p:85},{y:'2024',p:100}].forEach((y,i) => {
+            bars.append(`<div class="growth-bar-row"><span class="growth-bar-label">${y.y}</span><div class="growth-bar-track"><div class="growth-bar-fill" style="width:${y.p}%;animation-delay:${i*0.1}s;"></div></div></div>`);
+        });
+    }
+
+    function renderDashboard(data) {
+        $('#search-view').addClass('d-none');
+        $('#dashboard-view').removeClass('d-none');
+        window.currentData = data;
+
+        $('#sidebarProfileCard').html(`
+            <div class="p-3 rounded-3" style="background:rgba(99,102,241,0.07);border:1px solid rgba(99,102,241,0.12);">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <img src="${data.profile.avatar_url}" width="32" height="32" class="rounded-circle">
+                    <div><div class="fw-bold small">${data.profile.username}</div><div class="text-muted" style="font-size:0.7rem;">${data.career_role}</div></div>
+                </div>
+                <button class="btn btn-modern w-100 py-2" id="newSearchBtn" style="font-size:0.8rem;">Analyze Another</button>
+            </div>
+        `);
+
+        $('#profileHeader').html(`
+            <div class="glass-card p-4 mb-5 animate-fade-in">
+                <div class="row align-items-center g-3">
+                    <div class="col-auto"><img src="${data.profile.avatar_url}" class="profile-avatar"></div>
+                    <div class="col">
+                        <div class="d-flex flex-wrap align-items-center gap-3 mb-1">
+                            <h2 class="fw-bold mb-0">${data.profile.name || data.profile.username}</h2>
+                            <span class="badge-personality badge-${data.metrics.personality.toLowerCase()}">${data.metrics.personality}</span>
+                        </div>
+                        <p class="text-muted mb-2 small">${data.profile.bio || 'No bio available'}</p>
+                        <div class="d-flex flex-wrap gap-3 small text-muted fw-medium">
+                            <span>${data.profile.location}</span><span>${data.profile.company}</span>
+                            <span><strong class="text-dark">${data.profile.followers}</strong> Followers</span>
+                            <span><strong class="text-dark">${data.profile.public_repos}</strong> Repos</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `);
+
+        // Section Templates
+        $('#section-overview').html(`
+            <div class="row g-4 mb-4">
+                <div class="col-sm-6 col-md-3"><div class="glass-card p-4 h-100 text-center"><div class="metric-label mb-2">Activity Score</div><div class="metric-value gradient-text mb-2">${data.activity_score}</div></div></div>
+                <div class="col-sm-6 col-md-3"><div class="glass-card p-4 h-100 text-center"><div class="metric-label mb-2">Consistency</div><div class="gauge-container mb-1"><div class="gauge-bg"></div><div class="gauge-fill" style="transform:rotate(${-90 + data.metrics.consistency_score*1.8}deg)"></div></div><div class="fw-bold fs-5">${data.metrics.consistency_score}%</div></div></div>
+                <div class="col-sm-6 col-md-3"><div class="glass-card p-4 h-100 text-center"><div class="metric-label mb-2">Diversity Index</div><div class="fw-bold fs-2 text-secondary">${data.metrics.diversity_index}%</div></div></div>
+                <div class="col-sm-6 col-md-3"><div class="glass-card p-4 h-100 text-center"><div class="metric-label mb-2">Complexity</div><div class="fw-bold fs-3 text-primary">${data.metrics.complexity_level}</div></div></div>
+            </div>
+            <div class="glass-card p-4">
+                <h5 class="fw-bold mb-4">Developer DNA Breakdown</h5>
+                <div class="row">${['Builder','Collaborator','Innovator','Consistency'].map(k => `
+                    <div class="col-md-6"><div class="dna-bar-row"><div class="dna-bar-label"><span>${k}</span><span>${data.dna[k]}%</span></div><div class="dna-bar-track"><div class="dna-bar-fill dna-${k.toLowerCase().slice(0,7)}" style="width:${data.dna[k]}%"></div></div></div></div>
+                `).join('')}</div>
+            </div>
+        `);
+
+        $('#section-activity').html(`
+            <div class="row g-4 mb-4">
+                <div class="col-lg-8"><div class="glass-card p-4 h-100"><h5 class="fw-bold mb-4">Developer Radar</h5><canvas id="dnaRadarCanvas"></canvas></div></div>
+                <div class="col-lg-4"><div class="glass-card p-4 h-100 text-center"><h5 class="fw-bold mb-4">Productivity Pattern</h5><div class="display-6 fw-bold mb-2 text-primary">${data.productivity_pattern}</div></div></div>
+            </div>
+        `);
+
+        $('#section-technology').html(`
+            <div class="glass-card p-4 mb-4">
+                <h5 class="fw-bold mb-4">Technology Evolution</h5>
+                <div class="timeline-modern">${data.evolution.map(e => `
+                    <div class="timeline-item" style="opacity:1"><div class="timeline-year">${e.year}</div><div class="timeline-lang">${e.language}</div><div class="text-muted small">${e.repo}</div></div>
+                `).join('')}</div>
+            </div>
+            <div class="row g-4"><div class="col-md-6"><div class="glass-card p-4"><h5 class="fw-bold mb-4">Ecosystem</h5><canvas id="langPieCanvas"></canvas></div></div><div class="col-md-6"><div class="glass-card p-4"><h5 class="fw-bold mb-4">Skills</h5><canvas id="skillRadarCanvas"></canvas></div></div></div>
+        `);
+
+        $('#section-repos').html(`
+            <h4 class="fw-bold mb-4">Top Repositories</h4>
+            <div class="row g-4">${data.top_repos.map(r => `
+                <div class="col-md-6 col-xl-4">
+                    <div class="repo-card-modern shadow-sm" style="opacity:1">
+                        <div class="repo-header"><h6 class="fw-bold mb-2"><a href="${r.html_url}" target="_blank" class="text-decoration-none text-dark">${r.name}</a></h6><p class="text-muted small mb-0">${r.description || ''}</p></div>
+                        <div class="repo-footer"><span class="small fw-semibold">★ ${r.stargazers_count}</span><span class="badge bg-light text-dark border rounded-pill px-2 small">${r.language || 'N/A'}</span></div>
+                        <div class="p-2 text-center" style="background:rgba(99,102,241,0.06);"><span class="small fw-bold text-primary">Impact: ${r.impact}</span></div>
+                    </div>
+                </div>
+            `).join('')}</div>
+        `);
+
+        $('#section-patterns').html(`
+            <div class="row g-4">${[
+                {l:'Rhythm',v:data.productivity_pattern,c:'primary'},
+                {l:'Depth',v:data.metrics.complexity_level,c:'secondary'},
+                {l:'Personality',v:data.metrics.personality,c:'accent'},
+                {l:'Diversity',v:data.metrics.diversity_index+'%',c:'green'},
+                {l:'Trajectory',v:data.growth_potential.level,c:'amber'},
+                {l:'Style',v:data.metrics.collaboration_level,c:'blue'}
+            ].map(p => `
+                <div class="col-md-4"><div class="pattern-card h-100" style="opacity:1"><h6 class="fw-bold mb-1">${p.l}</h6><div class="fw-bold mb-2" style="font-size:1.2rem;color:var(--${p.c})">${p.v}</div></div></div>
+            `).join('')}</div>
+        `);
+
+        $('#section-insights').html(`
+            <div class="glass-card p-5 text-center">
+                <h3 class="fw-bold mb-4">Smart Insights</h3>
+                <div class="row justify-content-center"><div class="col-lg-8">${data.insights.map(i => `
+                    <div class="insight-list-item" style="opacity:1"><div class="insight-bullet">✓</div><p class="mb-0 fw-medium">${i}</p></div>
+                `).join('')}</div></div>
+            </div>
+        `);
+
+        // Re-init events
+        $('#newSearchBtn, #backToSearch').on('click', () => { $('#dashboard-view').addClass('d-none'); $('#search-view').removeClass('d-none'); });
+        $('.nav-link-modern, .mobile-nav-pill').on('click', function(e) {
+            e.preventDefault();
+            const s = $(this).data('section');
+            $('.nav-link-modern, .mobile-nav-pill').removeClass('active');
+            $(`[data-section="${s}"]`).addClass('active');
+            $('.section-scope').addClass('d-none');
+            $(`#section-${s}`).removeClass('d-none');
+            initCharts(s, data);
+        });
+    }
+
+    function initCharts(s, data) {
+        if (s === 'activity') {
+            new Chart($('#dnaRadarCanvas'), { type: 'radar', data: { labels: ['Builder', 'Collaborator', 'Innovator', 'Consistency'], datasets: [{ data: [data.dna.Builder, data.dna.Collaborator, data.dna.Innovator, data.dna.Consistency], backgroundColor: 'rgba(99,102,241,0.18)', borderColor: '#6366f1', borderWidth: 2 }] }, options: { scales: { r: { beginAtZero: true, max: 100, ticks: { display: false } } }, plugins: { legend: { display: false } } } });
+        } else if (s === 'technology') {
+            new Chart($('#langPieCanvas'), { type: 'doughnut', data: { labels: Object.keys(data.language_distribution), datasets: [{ data: Object.values(data.language_distribution), backgroundColor: ['#6366f1','#a855f7','#f43f5e','#10b981','#f59e0b','#3b82f6','#ec4899','#14b8a6'], borderWidth: 0 }] }, options: { plugins: { legend: { position: 'bottom' } } } });
+            new Chart($('#skillRadarCanvas'), { type: 'radar', data: { labels: data.skill_radar.labels, datasets: [{ data: data.skill_radar.values, backgroundColor: 'rgba(168,85,247,0.18)', borderColor: '#a855f7', borderWidth: 2 }] }, options: { scales: { r: { beginAtZero: true, ticks: { display: false } } }, plugins: { legend: { display: false } } } });
+        }
+    }
+});
+</script>
+</body>
+</html>

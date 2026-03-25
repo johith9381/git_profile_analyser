@@ -2,14 +2,9 @@ from flask import Flask, render_template, request, redirect, url_for, session, j
 import requests
 import os
 from datetime import datetime, timedelta
-from sql_engine import init_db, save_analysis, get_sql_insights
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("DIL_SECRET_KEY", "dev-secret-key")
-
-# Initialize the SQL Database on startup
-init_db()
-
 
 def login_required():
     return True
@@ -404,12 +399,6 @@ def analyze():
         "growth_potential": growth,
         "insights": insights,
     }
-
-    # SQL Persistence and Novel Comparative Analytics
-    save_analysis(username, data)
-    sql_insights = get_sql_insights(username)
-    if sql_insights:
-        data["sql_oracle"] = sql_insights
 
     session["analysis"] = data
     return jsonify({"success": True, "redirect": url_for("dashboard")})
